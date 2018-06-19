@@ -25,7 +25,6 @@
 
         public ConfigFile()
         {
-            Bindings = new List<BindRule>();
             Depends = new List<string>();
             DynamicVariables = new Dictionary<string, string>();
             Files = new List<string>();
@@ -54,9 +53,6 @@
                 return Path.GetFullPath(Path.Combine(".", FilePath));
             }
         }
-
-        [XmlArray("bindings")]
-        public List<BindRule> Bindings { get; set; }
 
         public IEnumerable<ConfigFile> ConfigFilesLoaded
         {
@@ -184,7 +180,6 @@
             ExpandVariables(Variables, expandDynamicVariable, logger);
             ExpandVariables(Includes, expandDynamicVariable, logger);
             ExpandVariables(IncludeDirs, expandDynamicVariable, logger);
-            ExpandVariables(Bindings, expandDynamicVariable, logger);
             ExpandVariables(Mappings, expandDynamicVariable, logger);
             // Do it recursively
             foreach (var configFile in References)
