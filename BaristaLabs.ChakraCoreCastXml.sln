@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChakraCoreCastXml", "ChakraCoreCastXml\ChakraCoreCastXml.csproj", "{B35FFE81-081A-40E4-BE4E-438F7ACE4D57}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaristaLabs.ChakraCoreCastXml", "BaristaLabs.ChakraCoreCastXml\BaristaLabs.ChakraCoreCastXml.csproj", "{F18848C0-CB12-45D1-893C-9E9E8984231B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B35FFE81-081A-40E4-BE4E-438F7ACE4D57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B35FFE81-081A-40E4-BE4E-438F7ACE4D57}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B35FFE81-081A-40E4-BE4E-438F7ACE4D57}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B35FFE81-081A-40E4-BE4E-438F7ACE4D57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F18848C0-CB12-45D1-893C-9E9E8984231B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F18848C0-CB12-45D1-893C-9E9E8984231B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F18848C0-CB12-45D1-893C-9E9E8984231B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F18848C0-CB12-45D1-893C-9E9E8984231B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
