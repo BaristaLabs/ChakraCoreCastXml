@@ -33,7 +33,6 @@
             Includes = new List<IncludeRule>();
             Mappings = new List<ConfigBaseRule>();
             References = new List<ConfigFile>();
-            Sdks = new List<SdkRule>();
             Variables = new List<KeyValue>();
         }
 
@@ -113,9 +112,6 @@
 
         [XmlIgnore]
         public List<ConfigFile> References { get; set; }
-
-        [XmlElement("sdk")]
-        public List<SdkRule> Sdks { get; set; }
 
         [XmlElement("var")]
         public List<KeyValue> Variables { get; set; }

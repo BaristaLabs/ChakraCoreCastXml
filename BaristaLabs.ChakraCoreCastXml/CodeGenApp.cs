@@ -48,8 +48,6 @@
         /// </value>
         public HashSet<string> Macros { get; set; }
 
-        public string ConfigRootPath { get; set; }
-
         public string IntermediateOutputPath { get; set; } = "";
 
         public ConfigFile Config { get; set; }
@@ -104,17 +102,7 @@
                     }
                 }
 
-                var sdkResolver = new SdkResolver(Logger);
-
-                foreach (var config in Config.ConfigFilesLoaded)
-                {
-                    foreach (var sdk in config.Sdks)
-                    {
-                        config.IncludeDirs.AddRange(sdkResolver.ResolveIncludeDirsForSdk(sdk));
-                    }
-                }
-
-                var cppHeadersUpdated = GenerateHeaders(configsWithIncludes, consumerConfig);
+                GenerateHeaders(configsWithIncludes, consumerConfig);
 
                 if (Logger.HasErrors)
                 {
