@@ -5,6 +5,7 @@
     using Generator;
     using System.IO;
     using System;
+    using System.Xml.Linq;
 
     class Program
     {
@@ -44,6 +45,40 @@
                         Namespace = "ChakraCommon",
                     },
                 },
+                TypeMap = {
+                    { "void*", "IntPtr" },
+                    { "void**", "IntPtr*" },
+                    { "BYTE*", "byte[]" },
+                    { "char*", "string" },
+                    { "char**", "string" },
+                    { "uint16_t*", "string" },
+                    { "uint16_t**", "string" },
+                    { "unsigned int", "uint" },
+                    { "unsigned int*", "uint*" },
+                    { "short unsigned int", "ushort" },
+                    { "JsValueRef*", "JsValueRef[]" },
+                    //{ "JsValueRef**", "JsValueRef[]*" }
+                    { "wchar_t**", "string" }
+                },
+                ExportExtensions =
+                {
+                    new ExportExtensionRule
+                    {
+                        FunctionName = "JsCreateStringUtf16",
+                        Extensions =
+                        {
+                            new XAttribute("dllImportEx", ", CharSet = CharSet.Unicode")
+                        }
+                    },
+                    new ExportExtensionRule
+                    {
+                        FunctionName = "JsCopyString",
+                        Extensions =
+                        {
+                            new XAttribute("dllImportEx", ", CharSet = CharSet.Ansi")
+                        }
+                    }
+                }
             };
 
             var outputDi = Directory.CreateDirectory("../output");

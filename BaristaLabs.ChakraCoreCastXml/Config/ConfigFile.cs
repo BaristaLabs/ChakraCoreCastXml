@@ -28,25 +28,12 @@
             Depends = new List<string>();
             DynamicVariables = new Dictionary<string, string>();
             Files = new List<string>();
+            ExportExtensions = new List<ExportExtensionRule>();
             IncludeDirs = new List<IncludeDirRule>();
             IncludeProlog = new List<string>();
             Includes = new List<IncludeRule>();
             References = new List<ConfigFile>();
-            TypeMap = new Dictionary<string, string>() {
-                { "void*", "IntPtr" },
-                { "void**", "IntPtr*" },
-                { "BYTE*", "byte[]" },
-                { "char*", "string" },
-                { "char**", "string" },
-                { "uint16_t*", "string" },
-                { "uint16_t**", "string" },
-                { "unsigned int", "uint" },
-                { "unsigned int*", "uint*" },
-                { "short unsigned int", "ushort" },
-                //{ "JsValueRef*", "JsValueRef[]*" },
-                //{ "JsValueRef**", "JsValueRef[]*" }
-                { "wchar_t**", "string" }
-            };
+            TypeMap = new Dictionary<string, string>();
             Variables = new List<KeyValue>();
         }
 
@@ -81,6 +68,9 @@
         /// <value>The dynamic variables.</value>
         [XmlIgnore]
         public Dictionary<string, string> DynamicVariables { get; private set; }
+
+        [XmlIgnore]
+        public IList<ExportExtensionRule> ExportExtensions { get; set; }
 
         [XmlIgnore]
         public string ExtensionId { get { return Id + "-ext"; } }

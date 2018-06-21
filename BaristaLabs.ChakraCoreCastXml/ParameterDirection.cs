@@ -3,6 +3,7 @@
     public enum ParameterDirection
     {
         In,
-        Out
+        Out,
+        Ref
     }
 }

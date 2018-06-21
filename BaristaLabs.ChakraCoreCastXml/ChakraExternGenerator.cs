@@ -223,8 +223,13 @@
                     {
                         export.Add(new XAttribute("line", function.Line));
                     }
+                    var fnExtension = Config.ExportExtensions.FirstOrDefault(ed => ed.FunctionName == fn.Item2.Name);
+                    if (fnExtension != null)
+                    {
+                        export.Add(fnExtension.Extensions);
+                    }
 
-                    var ccg = CodeCommentGatherer.GetCodeCommentGatherer(fn.Item1.Name);
+                    var ccg = HeaderFilePostProcessor.GetPostProcessor(fn.Item1.Name);
                     var codeComment = ccg.GetCodeCommentPreviousToLine(int.Parse(function.Line));
 
                     var descriptionElement = new XElement("Description", new XText(new XText(Environment.NewLine) + "      "), new XCData(Environment.NewLine + String.Join(Environment.NewLine, codeComment) + Environment.NewLine), new XText(Environment.NewLine + "     "));
@@ -234,16 +239,16 @@
                     foreach (var arg in fn.Item2.Arguments.OrderBy(arg => int.Parse(arg.Line)))
                     {
                         var argTypeName = doc.GetTypeNameById(arg.Type);
+                        var direction = ParameterDirection.In;
+                        direction = ccg.GetArgumentDirection(int.Parse(arg.Line));
+                        if (direction != ParameterDirection.In && argTypeName.EndsWith('*'))
+                        {
+                            argTypeName = argTypeName.Substring(0, argTypeName.Length - 1);
+                        }
+
                         if (Config.TypeMap.ContainsKey(argTypeName))
                         {
                             argTypeName = Config.TypeMap[argTypeName];
-                        }
-
-                        var direction = ParameterDirection.In;
-                        if (argTypeName.EndsWith('*'))
-                        {
-                            direction = ParameterDirection.Out;
-                            argTypeName = argTypeName.Substring(0, argTypeName.Length - 1);
                         }
 
                         var argName = arg.Name;
@@ -262,9 +267,9 @@
                             parameter.Add(new XAttribute("line", arg.Line));
                         }
 
-                        if (direction == ParameterDirection.Out)
+                        if (direction != ParameterDirection.In)
                         {
-                            parameter.Add(new XAttribute("direction", "Out"));
+                            parameter.Add(new XAttribute("direction", direction.ToString()));
                         }
                         
                         parameters.Add(parameter);
