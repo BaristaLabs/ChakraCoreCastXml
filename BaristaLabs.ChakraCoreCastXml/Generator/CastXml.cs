@@ -104,6 +104,11 @@ namespace BaristaLabs.ChakraCoreCastXml.Generator
         public const string TagFunctionType = "FunctionType";
 
         /// <summary>
+        /// GccXml tag for Namespace
+        /// </summary>
+        public const string TagFile = "File";
+
+        /// <summary>
         /// Gets or sets the executable path of gccxml.exe.
         /// </summary>
         /// <value>The executable path.</value>

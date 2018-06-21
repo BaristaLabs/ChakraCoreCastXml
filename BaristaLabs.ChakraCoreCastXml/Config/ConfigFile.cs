@@ -31,8 +31,22 @@
             IncludeDirs = new List<IncludeDirRule>();
             IncludeProlog = new List<string>();
             Includes = new List<IncludeRule>();
-            Mappings = new List<ConfigBaseRule>();
             References = new List<ConfigFile>();
+            TypeMap = new Dictionary<string, string>() {
+                { "void*", "IntPtr" },
+                { "void**", "IntPtr*" },
+                { "BYTE*", "byte[]" },
+                { "char*", "string" },
+                { "char**", "string" },
+                { "uint16_t*", "string" },
+                { "uint16_t**", "string" },
+                { "unsigned int", "uint" },
+                { "unsigned int*", "uint*" },
+                { "short unsigned int", "ushort" },
+                //{ "JsValueRef*", "JsValueRef[]*" },
+                //{ "JsValueRef**", "JsValueRef[]*" }
+                { "wchar_t**", "string" }
+            };
             Variables = new List<KeyValue>();
         }
 
@@ -100,8 +114,8 @@
         [XmlElement("include")]
         public List<IncludeRule> Includes { get; set; }
 
-        [XmlArray("mapping")]
-        public List<ConfigBaseRule> Mappings { get; set; }
+        [XmlElement("IncludeLineNumbers")]
+        public bool IncludeLineNumbers { get; set; }
 
         /// <summary>
         /// Gets or sets the parent of this mapping file.
@@ -112,6 +126,9 @@
 
         [XmlIgnore]
         public List<ConfigFile> References { get; set; }
+
+        [XmlArray("TypeMap")]
+        public IDictionary<string, string> TypeMap { get; set; }
 
         [XmlElement("var")]
         public List<KeyValue> Variables { get; set; }
@@ -176,7 +193,6 @@
             ExpandVariables(Variables, expandDynamicVariable, logger);
             ExpandVariables(Includes, expandDynamicVariable, logger);
             ExpandVariables(IncludeDirs, expandDynamicVariable, logger);
-            ExpandVariables(Mappings, expandDynamicVariable, logger);
             // Do it recursively
             foreach (var configFile in References)
                 configFile.ExpandVariables(expandDynamicVariable, logger);

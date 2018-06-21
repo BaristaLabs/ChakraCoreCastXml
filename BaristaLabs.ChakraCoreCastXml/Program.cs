@@ -64,17 +64,16 @@
                 OutputPath = "",
             };
 
-            var codeGenApp = new CodeGenApp(logger)
+            var codeGenApp = new ChakraExternGenerator(logger)
             {
                 CastXmlExecutablePath = castXmlPath,
                 Config = config,
-                OutputDirectory = chakraSharpDir.FullName,
+                OutputDirectory = @"C:\Projects\BaristaCore",
                 IntermediateOutputPath = intermediateOutputDir.FullName,
             };
 
             codeGenApp.Init();
             codeGenApp.Run();
-            Console.ReadLine();
         }
     }
 }
