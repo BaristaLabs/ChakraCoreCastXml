@@ -45,20 +45,28 @@
                         Namespace = "ChakraCommon",
                     },
                 },
+                IgnoreFunctions =
+                {
+                    "^JsTTD.*"
+                },
                 TypeMap = {
-                    { "void*", "IntPtr" },
-                    { "void**", "IntPtr*" },
-                    { "BYTE*", "byte[]" },
-                    { "char*", "string" },
-                    { "char**", "string" },
-                    { "uint16_t*", "string" },
-                    { "uint16_t**", "string" },
-                    { "unsigned int", "uint" },
-                    { "unsigned int*", "uint*" },
-                    { "short unsigned int", "ushort" },
-                    { "JsValueRef*", "JsValueRef[]" },
-                    //{ "JsValueRef**", "JsValueRef[]*" }
-                    { "wchar_t**", "string" }
+                    new TypeMapRule { From = "void*", To = "IntPtr" },
+                    new TypeMapRule { From = "void**", To = "IntPtr*" },
+                    new TypeMapRule { From = "BYTE*", To = "byte[]" },
+                    new TypeMapRule { From = "char", FromDirection = ParameterDirection.Out, To = "char*", ToDirection = ParameterDirection.In },
+                    new TypeMapRule { From = "char**", To = "string" },
+                    new TypeMapRule { From = "uint16_t", FromDirection = ParameterDirection.Out, To = "uint16_t*", ToDirection = ParameterDirection.In },
+                    new TypeMapRule { From = "uint16_t**", To = "string" },
+                    new TypeMapRule { From = "unsigned int", To = "uint" },
+                    new TypeMapRule { From = "unsigned int*", To = "uint*" },
+                    new TypeMapRule { From = "short unsigned int", To = "ushort" },
+                    new TypeMapRule { From = "JsValueRef*", To = "JsValueRef[]" },
+                    new TypeMapRule { From = "JsWeakRef", FromDirection = ParameterDirection.Out, To = "IntPtr" },
+                    new TypeMapRule { From = "BYTE", FromDirection = ParameterDirection.Out, To = "byte[]", ToDirection = ParameterDirection.In },
+                    new TypeMapRule { From = "ChakraBytePtr", To = "IntPtr" },
+                    new TypeMapRule { From = "wchar_t**", FromDirection = ParameterDirection.In, To = "string" },
+                    new TypeMapRule { From = "wchar_t**", FromDirection = ParameterDirection.Out, To = "IntPtr" },
+                    new TypeMapRule { From = "JsSharedArrayBufferContentHandle", FromDirection = ParameterDirection.Out, To = "IntPtr" },
                 },
                 ExportExtensions =
                 {

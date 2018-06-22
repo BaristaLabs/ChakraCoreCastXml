@@ -8,6 +8,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Xml.Linq;
 
     /// <summary>
@@ -20,7 +21,6 @@
         /// </summary>
         public ChakraExternGenerator(Logger logger)
         {
-            Macros = new HashSet<string>();
             Logger = logger;
         }
 
@@ -37,14 +37,6 @@
         public string OutputDirectory { get; set; }
        
         public Logger Logger { get; }
-
-        /// <summary>
-        /// Gets or sets the macros.
-        /// </summary>
-        /// <value>
-        /// The macros.
-        /// </value>
-        public HashSet<string> Macros { get; set; }
 
         public string IntermediateOutputPath { get; set; } = "";
 
@@ -65,7 +57,7 @@
                 throw new ArgumentNullException(nameof(Config));
             }
 
-            Config = ConfigFile.Load(Config, Macros.ToArray(), Logger);
+            Config = ConfigFile.Load(Config, Logger);
 
             if (Logger.HasErrors)
             {
@@ -204,6 +196,21 @@
   "));
                 foreach (var fn in g.OrderBy(f => int.Parse(f.Item2.Line)))
                 {
+
+                    bool skip = false;
+                    foreach(var ignoreFunctionPattern in Config.IgnoreFunctions)
+                    {
+                        if (Regex.IsMatch(fn.Item2.Name, ignoreFunctionPattern))
+                        {
+                            skip = true;
+                        }
+                    }
+                    
+                    if (skip)
+                    {
+                        continue;
+                    }
+
                     var filePath = fn.Item1.Name;
                     var function = fn.Item2;
 
@@ -246,9 +253,14 @@
                             argTypeName = argTypeName.Substring(0, argTypeName.Length - 1);
                         }
 
-                        if (Config.TypeMap.ContainsKey(argTypeName))
+                        var typeMap = Config.TypeMap.FirstOrDefault(tm => tm.From == argTypeName && (tm.FromDirection == null || tm.FromDirection == direction));
+                        if (typeMap != null)
                         {
-                            argTypeName = Config.TypeMap[argTypeName];
+                            argTypeName = typeMap.To;
+                            if (typeMap.ToDirection != null)
+                            {
+                                direction = typeMap.ToDirection.Value;
+                            }
                         }
 
                         var argName = arg.Name;

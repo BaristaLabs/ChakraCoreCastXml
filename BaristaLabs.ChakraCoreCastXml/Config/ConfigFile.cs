@@ -9,12 +9,10 @@
     using System.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
-    using System.Xml.Serialization;
 
     /// <summary>
     /// Config File.
     /// </summary>
-    [XmlRoot("config", Namespace = NS)]
     public class ConfigFile
     {
         internal const string NS = "urn:ChakraCore.Config";
@@ -29,17 +27,17 @@
             DynamicVariables = new Dictionary<string, string>();
             Files = new List<string>();
             ExportExtensions = new List<ExportExtensionRule>();
+            IgnoreFunctions = new List<string>();
             IncludeDirs = new List<IncludeDirRule>();
             IncludeProlog = new List<string>();
             Includes = new List<IncludeRule>();
             References = new List<ConfigFile>();
-            TypeMap = new Dictionary<string, string>();
+            TypeMap = new List<TypeMapRule>();
             Variables = new List<KeyValue>();
         }
 
         #region Properties
 
-        [XmlIgnore]
         public string AbsoluteFilePath
         {
             get
@@ -59,68 +57,54 @@
             get { return GetRoot().MapIdToFile.Values; }
         }
 
-        [XmlElement("depends")]
         public List<string> Depends { get; set; }
 
         /// <summary>
         /// Gets dynamic variables used by dynamic variable substitution #(MyVariable)
         /// </summary>
         /// <value>The dynamic variables.</value>
-        [XmlIgnore]
         public Dictionary<string, string> DynamicVariables { get; private set; }
 
-        [XmlIgnore]
         public IList<ExportExtensionRule> ExportExtensions { get; set; }
 
-        [XmlIgnore]
         public string ExtensionId { get { return Id + "-ext"; } }
 
         /// <summary>
         /// Gets the name of the extension header file.
         /// </summary>
         /// <value>The name of the extension header file.</value>
-        [XmlIgnore]
         public string ExtensionFileName { get { return ExtensionId + ".h"; } }
 
         /// <summary>
         /// Gets or sets the path of this MappingFile. If not null, used when saving this file.
         /// </summary>
         /// <value>The path.</value>
-        [XmlIgnore]
         public string FilePath { get; set; }
 
-        [XmlElement("file")]
         public List<string> Files { get; set; }
 
-        [XmlAttribute("id")]
         public string Id { get; set; }
 
-        [XmlElement("include-dir")]
+        public IList<string> IgnoreFunctions { get; set; }
+
         public List<IncludeDirRule> IncludeDirs { get; set; }
 
-        [XmlElement("include-prolog")]
         public List<string> IncludeProlog { get; set; }
 
-        [XmlElement("include")]
         public List<IncludeRule> Includes { get; set; }
 
-        [XmlElement("IncludeLineNumbers")]
         public bool IncludeLineNumbers { get; set; }
 
         /// <summary>
         /// Gets or sets the parent of this mapping file.
         /// </summary>
         /// <value>The parent.</value>
-        [XmlIgnore]
         public ConfigFile Parent { get; set; }
 
-        [XmlIgnore]
         public List<ConfigFile> References { get; set; }
 
-        [XmlArray("TypeMap")]
-        public IDictionary<string, string> TypeMap { get; set; }
+        public IList<TypeMapRule> TypeMap { get; set; }
 
-        [XmlElement("var")]
         public List<KeyValue> Variables { get; set; }
         #endregion
 
@@ -207,18 +191,6 @@
                     list[i] = ExpandVariables(list[i], expandDynamicVariable, logger);
                 return list;
             }
-            foreach (var propertyInfo in objectToExpand.GetType().GetRuntimeProperties())
-            {
-                if (!propertyInfo.GetCustomAttributes<XmlIgnoreAttribute>(false).Any())
-                {
-                    // Check that this field is "ShouldSerializable"
-                    var method = objectToExpand.GetType().GetRuntimeMethod("ShouldSerialize" + propertyInfo.Name, Type.EmptyTypes);
-                    if (method != null && !((bool)method.Invoke(objectToExpand, null)))
-                        continue;
-
-                    propertyInfo.SetValue(objectToExpand, ExpandVariables(propertyInfo.GetValue(objectToExpand, null), expandDynamicVariable, logger), null);
-                }
-            }
             return objectToExpand;
         }
 
@@ -247,40 +219,6 @@
             return null;
         }
 
-        private void PostLoad(ConfigFile parent, string file, string[] macros, IEnumerable<KeyValue> variables, Logger logger)
-        {
-            FilePath = file;
-            Parent = parent;
-
-            if (AbsoluteFilePath != null)
-            {
-                Variables.Add(new KeyValue("THIS_CONFIG_PATH", Path.GetDirectoryName(AbsoluteFilePath)));
-            }
-
-            Variables.AddRange(variables);
-
-            // Load all dependencies
-            foreach (var dependFile in Files)
-            {
-                var dependFilePath = ExpandString(dependFile, false, logger);
-                if (!Path.IsPathRooted(dependFilePath) && AbsoluteFilePath != null)
-                    dependFilePath = Path.Combine(Path.GetDirectoryName(AbsoluteFilePath), dependFilePath);
-
-                var subMapping = Load(this, dependFilePath, macros, variables, logger);
-                if (subMapping != null)
-                {
-                    subMapping.FilePath = dependFile;
-                    References.Add(subMapping);
-                }
-            }
-
-            // Clear all depends file
-            Files.Clear();
-
-            // Add this mapping file
-            GetRoot().MapIdToFile.Add(Id, this);
-        }
-
         private void Verify(Logger logger)
         {
             Depends.Remove("");
@@ -305,45 +243,8 @@
                 mappingFile.Verify(logger);
         }
 
-        /// <summary>
-        /// Loads the specified config file attached to a parent config file.
-        /// </summary>
-        /// <param name="parent">The parent.</param>
-        /// <param name="file">The file.</param>
-        /// <returns>The loaded config</returns>
-        private static ConfigFile Load(ConfigFile parent, string file, string[] macros, IEnumerable<KeyValue> variables, Logger logger)
-        {
-            if (!File.Exists(file))
-            {
-                logger.Error(LoggingCodes.ConfigNotFound, "Configuration file {0} not found.", file);
-                return null;
-            }
-
-            var deserializer = new XmlSerializer(typeof(ConfigFile));
-            ConfigFile config = null;
-            try
-            {
-                logger.PushLocation(file);
-
-                config = (ConfigFile)deserializer.Deserialize(new StringReader(Preprocessor.Preprocess(File.ReadAllText(file), macros)));
-
-                if (config != null)
-                    config.PostLoad(parent, file, macros, variables, logger);
-            }
-            catch (Exception ex)
-            {
-                logger.Error(LoggingCodes.UnableToParseConfig, "Unable to parse file [{0}]", ex, file);
-            }
-            finally
-            {
-                logger.PopLocation();
-            }
-            return config;
-        }
-
-        public static ConfigFile Load(ConfigFile root, string[] macros, Logger logger, params KeyValue[] variables)
-        {
-            root.PostLoad(null, null, macros, variables, logger);
+        public static ConfigFile Load(ConfigFile root, Logger logger)
+        {     
             root.Verify(logger);
             root.ExpandVariables(false, logger);
             return root;
