@@ -85,10 +85,8 @@
 
                 var configsWithIncludes = new HashSet<ConfigFile>();
 
-                if (Config.ConfigFilesLoaded.Count() == 0)
-                {
-                    Logger.Warning(LoggingCodes.CastXmlWarning, "No include files loaded.");
-                }
+                // Add the root
+                configsWithIncludes.Add(Config);
 
                 foreach (var config in Config.ConfigFilesLoaded)
                 {
