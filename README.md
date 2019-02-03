@@ -1,7 +1,7 @@
 ChakraCore CastXML
 ---
 
-The associated BaristaCore project uses a auto-generated wrapper around ChakraCore named ChakraExternDefinitions.xml
+The associated [BaristaCore](https://github.com/BaristaLabs/BaristaCore/) project uses a auto-generated header definition that describes ChakraCore.h named ChakraExternDefinitions.xml
 This repository contains the mechanism of generating the ChakraExternDefinitions.xml file directly from ChakraCore source using CastXML
 
 The generated headers xml might be useful for other projects as well.
@@ -13,6 +13,7 @@ Dependencies:
 - DotNetCore 2.2
 
 ```
+git clone https://github.com/Microsoft/ChakraCore
 git clone https://github.com/BaristaLabs/ChakraCoreCastXML
 cd ChakraCoreCastXML\BaristaLabs.ChakraCoreCastXml
 dotnet run
