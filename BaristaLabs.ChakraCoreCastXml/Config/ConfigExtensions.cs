@@ -1,6 +1,5 @@
 ﻿namespace BaristaLabs.ChakraCoreCastXml.Config
 {
-    using System.Linq;
     using System.Collections.Generic;
 
     public static class ConfigExtensions

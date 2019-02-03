@@ -16,9 +16,9 @@
 
         public const string RegistryKeyNotFound = "SG0007";
 
-        public const string UnkownVariable = "SG0008";
+        public const string UnknownVariable = "SG0008";
 
-        public const string UnkownDynamicVariable = "SG0009";
+        public const string UnknownDynamicVariable = "SG0009";
 
         public const string InvalidMethodReturnType = "SG0010";
 
